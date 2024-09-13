@@ -1,0 +1,27 @@
+trigger:
+- main
+
+pool:
+  vmImage: 'ubuntu-latest'
+
+steps:
+- task: UsePythonVersion@0
+  inputs:
+    versionSpec: '3.x'
+    addToPath: true
+
+- script: |
+    python -m venv env
+    source env/bin/activate
+    pip install -r requirements.txt
+    python -m unittest discover
+  displayName: 'Install dependencies and run tests'
+
+- task: Docker@2
+  inputs:
+    containerRegistry: 'YOUR_CONTAINER_REGISTRY'
+    repository: 'YOUR_REPOSITORY_NAME'
+    command: 'buildAndPush'
+    Dockerfile: '**/Dockerfile'
+    tags: |
+      $(Build.BuildId)
